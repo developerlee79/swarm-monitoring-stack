@@ -1,0 +1,20 @@
+---
+
+server:
+  name: kibana
+  host: 0.0.0.0
+
+monitoring:
+  ui:
+   container:
+    elasticsearch:
+     enabled: true
+
+elasticsearch:
+  hosts: [ "http://elasticsearch:9200" ]
+  username: "kibana_system"
+  password: "changeme"
+
+xpack:
+  encryptedSavedObjects:
+    encryptionKey: 'encryption_key_for_elastic_stack_security'

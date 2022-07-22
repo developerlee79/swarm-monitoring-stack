@@ -1,0 +1,115 @@
+# ============================== Filebeat inputs ===============================
+
+filebeat.inputs:
+
+# filestream is an input for collecting log messages from files.
+- type: log
+
+  # Unique ID among all inputs, an ID is required.
+  id: monitor-log-input
+
+  # Encoding
+  encoding: utf-8
+
+  # Change to true to enable this input configuration.
+  enabled: true
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  paths:
+    - /directory/of/target/logs/*.log
+   
+  # Ignore files that were modified before the specified timespan.
+  ignore_older: 12h
+  
+  # Ignore JSON decoding error
+  ignore_decoding_error: true
+    
+  # Exclude lines. A list of regular expressions to match. It drops the lines that are
+  # matching any regular expression from the list.
+  #exclude_lines: ['^DBG']
+
+  # Include lines. A list of regular expressions to match. It exports the lines that are
+  # matching any regular expression from the list.
+  #include_lines: ['^ERR', '^WARN']
+
+  # Exclude files. A list of regular expressions to match. Filebeat drops the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.exclude_files: ['.gz$']
+
+  # Optional additional fields. These fields can be freely picked
+  # to add additional information to the crawled log files for filtering
+  #fields:
+  #  level: debug
+  #  review: 1
+  
+# ============================== Kafka Output ==============================
+output.kafka:
+    enable: true
+    # Kafka hosts
+    hosts: ['your_kafka_server_ip:9094']
+    # Kafka topic
+    topic: 'test_topic'
+    # Publish only reachable partition
+    partition.round_robin:
+        reachable_only: false
+
+# ============================== Filebeat modules ==============================
+
+filebeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+  # Period on which files under path should be checked for changes
+  #reload.period: 10s
+
+# ================================== General ===================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+name: monitor-log-filebeat
+
+# The tags of the shipper are included in their own field with each
+# transaction published.
+#tags: ["service-X", "web-tier"]
+
+# Optional fields that you can specify to add additional information to the
+# output.
+#fields:
+#  env: staging
+
+# ================================= Processors =================================
+processors:
+   drop_fields:
+        fields: ["log", "offset"]
+   add_host_metadata:
+       when.not.contains.tags: forwarded
+  # add_cloud_metadata: ~
+  # add_docker_metadata: ~
+
+# ================================== Logging ===================================
+
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+logging.level: info
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publisher", "service".
+logging.selectors: [ harvester, input ]
+logging.metrics.period: 30s
+
+# ============================= X-Pack Monitoring ==============================
+# Filebeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
+
+# Set to true to enable the monitoring reporter.
+#monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Filebeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:

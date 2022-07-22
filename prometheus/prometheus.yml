@@ -1,0 +1,31 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'monitor-system'
+
+rule_files:
+
+scrape_configs:
+
+  - job_name: 'prometheus'
+    static_configs:
+      # Metrics of Prometheus
+      - targets: [ 'localhost:9090' ]
+
+  - job_name: 'docker'
+    static_configs:
+      # Docker metrics exposed by /etc/docker/daemon.json
+      - targets: [ '172.17.0.1:9323' ]
+
+  - job_name: 'cadvisor'
+    dns_sd_configs:
+      - names: [ 'tasks.cadvisor' ]
+        type: 'A'
+        port: 8080
+
+  - job_name: 'node-exporter'
+    dns_sd_configs:
+      - names: [ 'tasks.node-exporter' ]
+        type: 'A'
+        port: 9100

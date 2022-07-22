@@ -1,0 +1,133 @@
+version: '3.7'
+
+
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,z
+      # Uncomment after completing basic security settings
+      # - ./elasticsearch/config/elastic-certificates.p12:/usr/share/elasticsearch/config/elastic-certificates.p12:ro,z
+      # - ./elasticsearch/config/elastic-stack-ca.p12:/usr/share/elasticsearch/config/elastic-stack-ca.p12:ro,z
+      - elasticsearch:/usr/share/elasticsearch/data:z
+    environment:
+      node.name: "{{ .Node.Hostname }}"
+      discovery.seed_hosts: elasticsearch
+      cluster.initial_master_nodes: ${NODE_LIST}
+      ES_JAVA_OPTS: -Xmx512m -Xms512m
+      ELASTIC_PASSWORD: "changeme"
+    deploy:
+      mode: global
+      restart_policy:
+       condition: on-failure
+       delay: 5s
+       max_attempts: 3
+      resources:
+        limits:
+         memory: 2G
+    networks:
+      - monitor_network
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${ELASTIC_VERSION}
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
+    ports:
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: -Xmx256m -Xms256m
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - monitor_network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+    ports:
+      - "5601:5601"
+    networks:
+      - monitor_network
+    deploy:
+     placement:
+      constraints: [node.role == manager]
+
+  prometheus:
+    image: prom/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention=24h'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitor_network
+    deploy:
+     placement:
+      constraints: [node.role == manager]
+
+  grafana:
+    image: grafana/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana:/var/lib/grafana
+      - ./grafana:/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    networks:
+      - monitor_network
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  node-exporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    ports:
+      - "9100:9100"
+    deploy:
+      mode: global
+    networks:
+      - monitor_network
+
+  cadvisor:
+    image: google/cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+    networks:
+      - monitor_network
+
+networks:
+  monitor_network:
+   external: true
+
+volumes:
+  elasticsearch:
+  grafana:
