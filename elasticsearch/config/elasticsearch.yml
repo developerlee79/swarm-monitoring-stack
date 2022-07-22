@@ -1,0 +1,16 @@
+---
+cluster.name: 'elastic_cluster'
+network.host: 0.0.0.0
+
+xpack:
+  license:
+    self_generated.type: basic
+  security:
+    enabled: true
+    transport:
+      ssl:
+        enabled: true
+        verification_mode: certificate
+        client_authentication: optional
+        keystore.path: elastic-certificates.p12
+        truststore.path: elastic-certificates.p12

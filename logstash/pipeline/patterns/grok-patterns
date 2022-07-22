@@ -1,0 +1,2 @@
+# Patterns
+TEST_PATTERN %{WORD:hello}, %{WORD:world}!
