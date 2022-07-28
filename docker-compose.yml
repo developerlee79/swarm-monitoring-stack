@@ -29,6 +29,18 @@ services:
     networks:
       - monitor_network
 
+  nginx:
+    image: nginx:1
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./nginx/server.conf:/etc/nginx/conf.d/default.conf
+    deploy:
+      placement:
+        constraints: [ node.role == manager ]
+    networks:
+      - monitor_network
+
   logstash:
     image: docker.elastic.co/logstash/logstash:${ELASTIC_VERSION}
     volumes:

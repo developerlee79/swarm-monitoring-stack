@@ -9,6 +9,7 @@ All-in-one monitoring stack with docker swarm
 - Kafka & Zookeeper
 - Prometheus & Grafana
 - Node exporter & cAdvisor
+- Nginx
 
 ### Feature
 
@@ -16,6 +17,7 @@ All-in-one monitoring stack with docker swarm
   - Full support for global deploy Elasticsearch cluster without any hard coding
   - Full support for Elasticsearch security
   - Logstash configuration example
+  - Nginx Proxy for Elasticsearch
 - Monitor Docker Swarm nodes & services with Prometheus & Grafana
   - Collect Swarm metrics with Node exporter & cAdvisor
   - Two AWESOME basic dashboard
