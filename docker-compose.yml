@@ -29,6 +29,45 @@ services:
     networks:
       - monitor_network
 
+  fleet:
+    image: docker.elastic.co/beats/elastic-agent:${ELASTIC_VERSION}
+    user: root
+    # Uncomment after create certificates
+    # volumes:
+    #  - ./fleet-server/fleet-server.crt:/usr/share/elasticsearch-agent/cert/fleet-server.crt:ro,z
+    #  - ./fleet-server/fleet-server.key:/usr/share/elasticsearch-agent/cert/fleet-server.key:ro,z
+    #  - ./fleet-server/ca.crt:/usr/share/elasticsearch-agent/cert/ca.crt:ro,z
+    environment:
+      FLEET_URL: https://<Host Server IP>:8220
+      FLEET_SERVER_ENABLE: 1
+      FLEET_SERVER_POLICY: fleet-server-policy
+      FLEET_SERVER_ELASTICSEARCH_HOST: http://elasticsearch:9200
+      FLEET_SERVER_SERVICE_TOKEN: <SERVICE TOKEN>
+    # Uncomment after create certificates
+    #  FLEET_SERVER_CERT: /usr/share/elasticsearch-agent/cert/fleet-server.crt
+    #  FLEET_SERVER_CERT_KEY: /usr/share/elasticsearch-agent/cert/fleet-server.key
+    #  ELASTICSEARCH_CA: /usr/share/elasticsearch-agent/cert/ca.crt
+    #  CERTIFICATE_AUTHORITIES: /usr/share/elasticsearch-agent/cert/ca.crt
+    deploy:
+      placement:
+        constraints: [ node.role == manager ]
+    ports:
+      - "8220:8220"
+    networks:
+      - monitor_network
+
+  nginx:
+    image: nginx:1
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./nginx/server.conf:/etc/nginx/conf.d/default.conf
+    deploy:
+      placement:
+        constraints: [ node.role == manager ]
+    networks:
+      - monitor_network
+
   logstash:
     image: docker.elastic.co/logstash/logstash:${ELASTIC_VERSION}
     volumes:
