@@ -1,0 +1,36 @@
+name: "example_alert_rule"
+
+index: test-*
+
+type: frequency
+
+is_enabled: true
+
+num_events: 5
+
+timeframe:
+  minutes: 30
+
+realert:
+  minutes: 60
+
+filter:
+  - query:
+      query_string:
+        query: "text : Hello, World!"
+
+alert:
+  - "slack"
+
+alert_subject: ":warning: Error occurred at {0}!!"
+alert_subject_args:
+  - "@timestamp"
+alert_text: "Reason : {0}"
+alert_text_args:
+  - "reason"
+
+slack_webhook_url: 'https://hooks.slack.com/services/{your_slack_webhook}'
+slack_emoji_override: ":ghost:"
+slack_msg_color: "warning"
+slack_parse_override: "none"
+slack_username_override: "Monitoring Alert Manager"
