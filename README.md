@@ -10,6 +10,7 @@ All-in-one monitoring stack with docker swarm
 - [Prometheus](https://github.com/prometheus/prometheus) & [Grafana](https://github.com/grafana/grafana)
 - [Node exporter](https://github.com/prometheus/node_exporter) & [cAdvisor](https://github.com/google/cadvisor)
 - [Nginx](https://github.com/nginx/nginx)
+- [ElastAlert](https://github.com/jertel/elastalert2)
 
 ### Feature
 
@@ -19,6 +20,7 @@ All-in-one monitoring stack with docker swarm
   - Integrate with Elastic Agent & Fleet
   - Logstash configuration example
   - Nginx Proxy for Elasticsearch
+  - Real-time alteration system using ElastAlert
 - Monitor Docker Swarm nodes & services with Prometheus & Grafana
   - Collect Swarm metrics with Node exporter & cAdvisor
   - Two AWESOME basic dashboard
