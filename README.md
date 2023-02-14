@@ -4,12 +4,12 @@ All-in-one monitoring stack with docker swarm
 
 ### Stack
 
-- Docker Swarm
-- Elastic Stack (Elasticsearch, Logstash, Kibana, Filebeat, Fleet)
-- Kafka & Zookeeper
-- Prometheus & Grafana
-- Node exporter & cAdvisor
-- Nginx
+- [Docker Swarm](https://github.com/topics/docker)
+- [Elastic Stack](https://github.com/elastic) ([Elasticsearch](https://github.com/elastic/elasticsearch), [Logstash](https://github.com/elastic/logstash), [Kibana](https://github.com/elastic/kibana), [Filebeat](https://github.com/elastic/beats), [Fleet Server](https://github.com/elastic/fleet-server) & [Elastic Agent](https://github.com/elastic/elastic-agent))
+- [Kafka](https://github.com/apache/kafka) & [Zookeeper](https://github.com/apache/zookeeper)
+- [Prometheus](https://github.com/prometheus/prometheus) & [Grafana](https://github.com/grafana/grafana)
+- [Node exporter](https://github.com/prometheus/node_exporter) & [cAdvisor](https://github.com/google/cadvisor)
+- [Nginx](https://github.com/nginx/nginx)
 
 ### Feature
 
