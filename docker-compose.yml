@@ -56,6 +56,23 @@ services:
     networks:
       - monitor_network
 
+  elastic-alert:
+    image: jertel/elastalert2:2.9.0
+    volumes:
+      - ./elastic-alert/config.yml:/opt/elastalert/config.yml
+      - ./elastic-alert/rules:/opt/elastalert/rules
+    environment:
+      TZ: Asia/Seoul
+    ports:
+      - "8230:8230"
+    depends_on:
+      - elasticsearch
+    networks:
+      - monitor_network
+    deploy:
+      placement:
+        constraints: [ node.role == manager ]
+
   nginx:
     image: nginx:1
     ports:
