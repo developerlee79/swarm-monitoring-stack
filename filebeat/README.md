@@ -1,15 +1,19 @@
 # Filebeat Setup
 
-Download and install the public signing key
+### 1. Import the public signing key
 
-```console
+```bash
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 ```
 
-Create a file with a .repo extension (for example, elastic.repo) in your /etc/yum.repos.d/ directory and add the following lines:
+<br>
 
-```
-# vi /etc/yum.repos.d/elastic.repo
+### 2. Add the Elastic repository
+
+Create a `.repo` file (e.g., `elastic.repo`) in your `/etc/yum.repos.d/` directory and add the following content:
+
+```ini
+# /etc/yum.repos.d/elastic.repo
 
 [elastic-8.x]
 name=Elastic repository for 8.x packages
@@ -21,37 +25,53 @@ autorefresh=1
 type=rpm-md
 ```
 
-Install & enable filebeat
+<br>
 
-```console
+### 3. Install and enable Filebeat
+
+```bash
 yum install filebeat
 systemctl enable filebeat
-chkconfig filebeat
+chkconfig filebeat on
 ```
 
-Replace filebeat.yml with provided file and use 'setup' command to apply settings
+<br>
 
-```console
+### 4. Configure `filebeat.yml` and apply setup
+
+Replace the existing `filebeat.yml` with the provided configuration file, then apply the setup.
+
+```bash
 vi /etc/filebeat/filebeat.yml
+```
 
+Example configuration:
+
+```yaml
 # filebeat.yml
 
-## Set the log path to the log path of your application
+# Define the path to your application's log files
 filebeat.inputs:
-- type: log
-  paths:
-    - /directory/of/target/logs/*.log
-    
-## Set kafka hosts to your kafka server ip
-output.kafka:
-    hosts: ['your_kafka_server_ip:9094']
+  - type: log
+    paths:
+      - /directory/of/target/logs/*.log
 
+# Define your Kafka server address
+output.kafka:
+  hosts: ['your_kafka_server_ip:9094']
+```
+
+Apply the setup:
+
+```bash
 filebeat setup -e
 ```
 
-Use Start / Stop / Status commands with systemctl to manipulate filebeat
+<br>
 
-```console
+### 5. Manage Filebeat using systemctl
+
+```bash
 systemctl start filebeat
 systemctl status filebeat
 systemctl stop filebeat
