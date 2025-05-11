@@ -6,6 +6,9 @@ An all-in-one monitoring stack for Docker Swarm environments.
 
 ## Stack Components
 
+![monitor_architecture](https://github.com/user-attachments/assets/f6f42cea-bf3d-4cbe-b3cb-6e92eab3f804)
+
+
 * [Docker Swarm](https://github.com/topics/docker)
 * [Elastic Stack](https://github.com/elastic) ([Elasticsearch](https://github.com/elastic/elasticsearch), [Logstash](https://github.com/elastic/logstash), [Kibana](https://github.com/elastic/kibana), [Filebeat](https://github.com/elastic/beats), [Fleet Server](https://github.com/elastic/fleet-server), and [Elastic Agent](https://github.com/elastic/elastic-agent))
 * [Kafka](https://github.com/apache/kafka) & [Zookeeper](https://github.com/apache/zookeeper)
