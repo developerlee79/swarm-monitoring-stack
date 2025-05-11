@@ -2,49 +2,54 @@
 
 ## Description
 
-Kafka is the open-source distributed event store and stream-processing platform.
+Kafka is an open-source distributed event store and stream processing platform.
 
-It's perform as data pipeline that hands over log data sent from Filebeat to Logstash.
+In this stack, Kafka acts as a data pipeline, transferring log data from Filebeat to Logstash.
 
-Based on wurstmeister's kafka docker image.
+This setup is based on the `wurstmeister/kafka` Docker image.
+
+<br>
 
 ## Setup
 
-You must change the external advertised listeners in docker-compose.yml to the IP of the run server.
+You must update the advertised external listener IP address in `docker-compose.yml` to match the host server's IP:
 
-```
+```yaml
 # docker-compose.yml
 
 KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://your_kafka_server_ip:9094
 ```
 
+<br>
+
 ## Run
 
-You can just use shell script monitor_service.sh to run the kafka easily.
+To run Kafka using the provided shell script:
 
-```console
+```bash
 sh monitor_service.sh start
 ```
 
-Or use docker compose command.
+Alternatively, use Docker Compose directly:
 
-```console
+```bash
 docker compose up
 ```
 
-You can also use shell scripts to stop, check status, and print logs.
+To stop Kafka, check its status, or view logs:
 
-```
+```bash
 sh monitor_service.sh stop
 sh monitor_service.sh status
 sh monitor_service.sh logs
 ```
 
+<br>
+
 ## Commands
 
-**List kafka topics**
-```console
+**List Kafka topics:**
+
+```bash
 docker exec -ti kafka /opt/kafka/bin/kafka-topics.sh --describe --zookeeper zookeeper:2181
 ```
-
-

@@ -1,110 +1,149 @@
 # Docker Swarm Monitoring Stack
 
-All-in-one monitoring stack with docker swarm
+An all-in-one monitoring stack for Docker Swarm environments.
 
-### Stack
+<br>
 
-- [Docker Swarm](https://github.com/topics/docker)
-- [Elastic Stack](https://github.com/elastic) ([Elasticsearch](https://github.com/elastic/elasticsearch), [Logstash](https://github.com/elastic/logstash), [Kibana](https://github.com/elastic/kibana), [Filebeat](https://github.com/elastic/beats), [Fleet Server](https://github.com/elastic/fleet-server) & [Elastic Agent](https://github.com/elastic/elastic-agent))
-- [Kafka](https://github.com/apache/kafka) & [Zookeeper](https://github.com/apache/zookeeper)
-- [Prometheus](https://github.com/prometheus/prometheus) & [Grafana](https://github.com/grafana/grafana)
-- [Node exporter](https://github.com/prometheus/node_exporter) & [cAdvisor](https://github.com/google/cadvisor)
-- [Nginx](https://github.com/nginx/nginx)
-- [ElastAlert](https://github.com/jertel/elastalert2)
+## Stack Components
 
-### Feature
+![monitor_architecture](https://github.com/user-attachments/assets/f6f42cea-bf3d-4cbe-b3cb-6e92eab3f804)
 
-- "Elastic" log monitoring pipeline with Elastic Stack and Kafka
-  - Full support for global deploy Elasticsearch cluster without any hard coding
-  - Full support for Elasticsearch security
-  - Integrate with Elastic Agent & Fleet
-  - Logstash configuration example
-  - Nginx Proxy for Elasticsearch
-  - Real-time alteration system using ElastAlert
-- Monitor Docker Swarm nodes & services with Prometheus & Grafana
-  - Collect Swarm metrics with Node exporter & cAdvisor
-  - Two AWESOME basic dashboard
-- Shell Script for easy use of monitoring stack
+
+* [Docker Swarm](https://github.com/topics/docker)
+* [Elastic Stack](https://github.com/elastic) ([Elasticsearch](https://github.com/elastic/elasticsearch), [Logstash](https://github.com/elastic/logstash), [Kibana](https://github.com/elastic/kibana), [Filebeat](https://github.com/elastic/beats), [Fleet Server](https://github.com/elastic/fleet-server), and [Elastic Agent](https://github.com/elastic/elastic-agent))
+* [Kafka](https://github.com/apache/kafka) & [Zookeeper](https://github.com/apache/zookeeper)
+* [Prometheus](https://github.com/prometheus/prometheus) & [Grafana](https://github.com/grafana/grafana)
+* [Node Exporter](https://github.com/prometheus/node_exporter) & [cAdvisor](https://github.com/google/cadvisor)
+* [Nginx](https://github.com/nginx/nginx)
+* [ElastAlert](https://github.com/jertel/elastalert2)
+
+<br>
+
+## Features
+
+* **"Elastic"-based log monitoring pipeline using the Elastic Stack and Kafka**
+
+  * Fully supports global Elasticsearch cluster deployment without hardcoding
+  * Full Elasticsearch security integration
+  * Integration with Elastic Agent and Fleet
+  * Example Logstash configuration included
+  * Nginx proxy for Elasticsearch
+  * Real-time alerting via ElastAlert
+* **Docker Swarm node and service monitoring using Prometheus and Grafana**
+
+  * Collects Swarm metrics using Node Exporter and cAdvisor
+  * Includes two pre-built dashboards
+* **Shell script for easy monitoring stack control**
+
+<br>
 
 ## Setup
 
-> Require: Linux with Docker & Docker Compose installed and Docker Swarm cluster
->          
-> If you don't know how, BASIC_GUIDE.md will help you.
+> **Requirements**: A Linux environment with Docker, Docker Compose, and an active Docker Swarm cluster.
+> If you're unsure how to set this up, refer to `BASIC_GUIDE.md`.
 
-### 1. Increase vm.max_map_count for Elasticsearch
+<br>
 
-```console
+### 1. Increase `vm.max_map_count` for Elasticsearch
+
+```bash
 vi /etc/sysctl.conf
 
-# systemctl.conf
+# Add or update the following line
 vm.max_map_count=262144
 
+# Apply the changes
 sysctl -p
 ```
 
-### 2. Set daemon.json to expose docker daemon metrics for monitor container 
+<br>
 
-```console
+### 2. Configure `daemon.json` to expose Docker metrics for monitoring containers
+
+```bash
 vi /etc/docker/daemon.json
 
-# daemon.json
+# Example configuration
 {
   "metrics-addr" : "0.0.0.0:9323",
   "experimental" : true
 }
 ```
 
-### 3. Run Filebeat at server to be monitored
+<br>
 
-> Read filebeat/README.md
+### 3. Run Filebeat on the server to be monitored
 
-### 4. Run Kafka server
+> See `filebeat/README.md` for details.
 
-> Read kafka/README.md
+<br>
 
-### 5. Set Logstash input to Kafka server
+### 4. Start the Kafka server
 
-You must change the kafka bootstrap_servers in logstash.yml to the IP of the kafka server.
+> Refer to `kafka/README.md`.
 
-```
+<br>
+
+### 5. Configure Logstash to receive input from Kafka
+
+Modify the `bootstrap_servers` setting in `logstash.yml` to point to your Kafka server's IP.
+
+```ruby
 # logstash/config/logstash.yml
 
 input {
-    kafka {
-        bootstrap_servers => "your_kafka_server_ip:9094"
-        topics => ["test_topic"]
-        codec => json
-        decorate_events => true
-    }
+  kafka {
+    bootstrap_servers => "your_kafka_server_ip:9094"
+    topics => ["test_topic"]
+    codec => json
+    decorate_events => true
+  }
 }
 ```
 
-### 6. Set up security for Elasticsearch
+<br>
 
-Basic security must be set to use all the features of Elasticsearch.
+### 6. Set up Elasticsearch security
 
-Follow these [minimal security](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-minimal-setup.html) and [basic security](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-basic-setup.html) docs to complete the security settings and transfer the issued certificate to ./elasticsearch/config.
+To use all features, basic security must be enabled in Elasticsearch.
+Follow the [minimal security](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-minimal-setup.html) and [basic security](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-basic-setup.html) guides.
+Copy the generated certificate to `./elasticsearch/config`.
 
-If you don't need security, turn off the security at elasticsearch/config/elasticsearch.yml.
+If you do not need security, you can disable it in `elasticsearch/config/elasticsearch.yml`.
 
-### 7. Setup security for fleet server
+<br>
 
-After set up the basic security, you should create certificates for fleet server.
+### 7. Set up Fleet Server security
 
-Follow this [self-managed setup guide](https://www.elastic.co/guide/en/fleet/current/add-a-fleet-server.html) to set up server and [create the certificates](https://www.elastic.co/guide/en/fleet/current/secure-connections.html) and transfer it to ./fleet-server.
+After enabling basic security, you can create certificates for Fleet Server.
+Follow the [Fleet server setup guide](https://www.elastic.co/guide/en/fleet/current/add-a-fleet-server.html) and [certificate generation guide](https://www.elastic.co/guide/en/fleet/current/secure-connections.html).
+Copy the certificates to `./fleet-server`.
 
-It's not essential. If you don't want to use it, you can remove the Fleet server setting.
+> Fleet Server is optional. If not needed, you can remove the related configuration.
 
-## Run
+<br>
 
-You can just use shell script monitor_service.sh to run the monitoring system easily.
+## Running the Monitoring Stack
 
-```console
+Use the provided shell script to start, stop, or manage the monitoring stack:
+
+```bash
 sh monitor_service.sh start
 sh monitor_service.sh stop
 sh monitor_service.sh restart
 sh monitor_service.sh status
-sh monitor_service.sh logs {service name}
-sh monitor_service.sh update {service name}
+sh monitor_service.sh logs {service_name}
+sh monitor_service.sh update {service_name}
 ```
+
+<br>
+
+## Access Dashboards
+
+Once all services are running, you can access the following dashboards:
+
+|Service|URL|Description|
+|---|---|---|
+|Grafana|`http://<your_server_ip>:3000`|Default: admin/admin
+|Kibana|`http://<your_server_ip>:5601`||
+
