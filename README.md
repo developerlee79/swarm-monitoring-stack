@@ -132,3 +132,15 @@ sh monitor_service.sh status
 sh monitor_service.sh logs {service_name}
 sh monitor_service.sh update {service_name}
 ```
+
+<br>
+
+## Access Dashboards
+
+Once all services are running, you can access the following dashboards:
+
+|Service|URL|Description|
+|---|---|---|
+|Grafana|`http://<your_server_ip>:3000`|Default: admin/admin
+|Kibana|`http://<your_server_ip>:5601`||
+
