@@ -13,7 +13,8 @@ monitoring:
 elasticsearch:
   hosts: [ "http://elasticsearch:9200" ]
   username: "kibana_system"
-  password: "changeme"
+  # Password is injected via the ELASTICSEARCH_PASSWORD environment variable
+  # in docker-compose.yml (see .env.example)
 
 xpack:
   encryptedSavedObjects:

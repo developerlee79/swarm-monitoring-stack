@@ -11,7 +11,7 @@ An all-in-one monitoring stack for Docker Swarm environments.
 
 * [Docker Swarm](https://github.com/topics/docker)
 * [Elastic Stack](https://github.com/elastic) ([Elasticsearch](https://github.com/elastic/elasticsearch), [Logstash](https://github.com/elastic/logstash), [Kibana](https://github.com/elastic/kibana), [Filebeat](https://github.com/elastic/beats), [Fleet Server](https://github.com/elastic/fleet-server), and [Elastic Agent](https://github.com/elastic/elastic-agent))
-* [Kafka](https://github.com/apache/kafka) & [Zookeeper](https://github.com/apache/zookeeper)
+* [Kafka](https://github.com/apache/kafka) (KRaft mode — no Zookeeper required)
 * [Prometheus](https://github.com/prometheus/prometheus) & [Grafana](https://github.com/grafana/grafana)
 * [Node Exporter](https://github.com/prometheus/node_exporter) & [cAdvisor](https://github.com/google/cadvisor)
 * [Nginx](https://github.com/nginx/nginx)
@@ -86,10 +86,10 @@ vi /etc/docker/daemon.json
 
 ### 5. Configure Logstash to receive input from Kafka
 
-Modify the `bootstrap_servers` setting in `logstash.yml` to point to your Kafka server's IP.
+Modify the `bootstrap_servers` setting in the Logstash pipeline to point to your Kafka server's IP.
 
 ```ruby
-# logstash/config/logstash.yml
+# logstash/pipeline/logstash.conf
 
 input {
   kafka {
@@ -123,6 +123,19 @@ Copy the certificates to `./fleet-server`.
 
 <br>
 
+### 8. Configure environment variables
+
+Copy `.env.example` to `.env` and adjust the stack version and credentials.
+`monitor_service.sh` loads it automatically, and `.env` is git-ignored so
+secrets stay out of version control.
+
+```bash
+cp .env.example .env
+vi .env
+```
+
+<br>
+
 ## Running the Monitoring Stack
 
 Use the provided shell script to start, stop, or manage the monitoring stack:
@@ -144,6 +157,25 @@ Once all services are running, you can access the following dashboards:
 
 |Service|URL|Description|
 |---|---|---|
-|Grafana|`http://<your_server_ip>:3000`|Default: admin/admin
+|Grafana|`http://<your_server_ip>:3000`|Credentials from `.env` (`GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`)
 |Kibana|`http://<your_server_ip>:5601`||
+
+<br>
+
+## Component Versions
+
+Image versions are pinned (as of July 2026):
+
+|Component|Version|
+|---|---|
+|Elastic Stack (Elasticsearch, Logstash, Kibana, Elastic Agent)|9.4.3 (set via `ELASTIC_VERSION` in `.env`)|
+|Kafka|apache/kafka 4.1.2 (KRaft)|
+|Prometheus|v3.13.0|
+|Grafana|13.1.0|
+|Node Exporter|v1.11.1|
+|cAdvisor|v0.60.3 (`ghcr.io/google/cadvisor`)|
+|ElastAlert 2|2.30.0|
+
+> Upgrading an existing 8.x Elasticsearch cluster? Set `ELASTIC_VERSION` to the
+> latest 8.19.x release first and follow the official upgrade path to 9.x.
 

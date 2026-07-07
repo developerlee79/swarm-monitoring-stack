@@ -3,7 +3,8 @@
 filebeat.inputs:
 
 # filestream is an input for collecting log messages from files.
-- type: log
+# (the old "log" input was deprecated in 7.16 and removed in Filebeat 9)
+- type: filestream
 
   # Unique ID among all inputs, an ID is required.
   id: monitor-log-input
@@ -17,13 +18,10 @@ filebeat.inputs:
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
     - /directory/of/target/logs/*.log
-   
+
   # Ignore files that were modified before the specified timespan.
   ignore_older: 12h
-  
-  # Ignore JSON decoding error
-  ignore_decoding_error: true
-    
+
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list.
   #exclude_lines: ['^DBG']
