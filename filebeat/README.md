@@ -15,9 +15,9 @@ Create a `.repo` file (e.g., `elastic.repo`) in your `/etc/yum.repos.d/` directo
 ```ini
 # /etc/yum.repos.d/elastic.repo
 
-[elastic-8.x]
-name=Elastic repository for 8.x packages
-baseurl=https://artifacts.elastic.co/packages/8.x/yum
+[elastic-9.x]
+name=Elastic repository for 9.x packages
+baseurl=https://artifacts.elastic.co/packages/9.x/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
@@ -32,7 +32,6 @@ type=rpm-md
 ```bash
 yum install filebeat
 systemctl enable filebeat
-chkconfig filebeat on
 ```
 
 <br>
@@ -52,7 +51,8 @@ Example configuration:
 
 # Define the path to your application's log files
 filebeat.inputs:
-  - type: log
+  - type: filestream
+    id: monitor-log-input
     paths:
       - /directory/of/target/logs/*.log
 
