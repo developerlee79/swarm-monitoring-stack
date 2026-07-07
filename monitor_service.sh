@@ -3,20 +3,28 @@
 SYSTEM_NAME=Monitor_Stack
 STACK_NAME=monitor_stack
 STACK_NETWORK=monitor_network
-ELASTIC_VERSION=8.2.0
 NODE_LIST=$(echo $(docker node ls --format "{{ .Hostname }}") | sed "s/\s/,/g")
 
+# Load environment variables from .env (see .env.example)
+if [ -f ./.env ]
+  then
+    set -a
+    . ./.env
+    set +a
+fi
+ELASTIC_VERSION=${ELASTIC_VERSION:-9.4.3}
+
 isRunning() {
-   [ ! -z $(docker stack ls --format "{{ .Name }}") ] && return
+   docker stack ls --format "{{ .Name }}" | grep -qx "$STACK_NAME" && return
 }
 
 start() {
   if ! isRunning
     then
         echo "Run $SYSTEM_NAME"
-        export ELASTIC_VERSION=$ELASTIC_VERSION
-        export NODE_LIST=$NODE_LIST
-        if [ -z "$(docker network ls | grep $STACK_NETWORK)" ]
+        export ELASTIC_VERSION
+        export NODE_LIST
+        if [ -z "$(docker network ls --format "{{ .Name }}" | grep -x $STACK_NETWORK)" ]
           then
              docker network create --driver overlay --attachable $STACK_NETWORK
         fi
@@ -40,8 +48,8 @@ restart() {
   if isRunning
     then
       stop
-      echo "Wating 3 sec..."
-      sleep 3s
+      echo "Waiting 3 sec..."
+      sleep 3
       start
     else
       echo "$SYSTEM_NAME is not running"
