@@ -6,7 +6,9 @@ Kafka is an open-source distributed event store and stream processing platform.
 
 In this stack, Kafka acts as a data pipeline, transferring log data from Filebeat to Logstash.
 
-This setup is based on the `wurstmeister/kafka` Docker image.
+This setup is based on the official `apache/kafka` Docker image, running a
+single-node cluster in KRaft mode — Zookeeper is no longer required
+(support for it was removed in Kafka 4.0).
 
 <br>
 
@@ -48,8 +50,15 @@ sh monitor_service.sh logs
 
 ## Commands
 
+**Create the topic used by the pipeline** (optional — topics are auto-created
+with default settings; create it manually if you need specific partitioning):
+
+```bash
+docker exec -ti kafka /opt/kafka/bin/kafka-topics.sh --create --topic test_topic --partitions 3 --replication-factor 1 --bootstrap-server localhost:9092
+```
+
 **List Kafka topics:**
 
 ```bash
-docker exec -ti kafka /opt/kafka/bin/kafka-topics.sh --describe --zookeeper zookeeper:2181
+docker exec -ti kafka /opt/kafka/bin/kafka-topics.sh --describe --bootstrap-server localhost:9092
 ```
